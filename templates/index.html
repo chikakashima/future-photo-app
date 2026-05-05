@@ -35,6 +35,7 @@
     input[type="file"],
     input[type="text"] {
       width: 100%;
+      box-sizing: border-box;
       padding: 12px;
       margin-top: 8px;
       margin-bottom: 20px;
@@ -43,8 +44,11 @@
       font-size: 14px;
     }
 
-    button {
+    button,
+    .download-button {
       width: 100%;
+      box-sizing: border-box;
+      display: block;
       padding: 15px;
       background: linear-gradient(135deg, #ff4f8b, #ff7ab5);
       border: none;
@@ -53,9 +57,12 @@
       border-radius: 12px;
       cursor: pointer;
       transition: 0.3s;
+      text-decoration: none;
+      margin-top: 15px;
     }
 
-    button:hover {
+    button:hover,
+    .download-button:hover {
       opacity: 0.9;
     }
 
@@ -72,45 +79,48 @@
       margin-bottom: 20px;
     }
 
+    .error {
+      color: red;
+      font-size: 13px;
+      margin-top: 15px;
+    }
   </style>
-
 </head>
+
 <body>
+  <div class="container">
+    <h1>未来フォト生成</h1>
 
-<div class="container">
+    <p class="note">
+      ※将来の姿を予測するものではなく、イメージとして生成するサービスです
+    </p>
 
-  <h1>未来フォト生成</h1>
+    <form action="/generate" method="post" enctype="multipart/form-data">
+      <p>お子様の写真（ファイル名＝名前）</p>
+      <input type="file" name="child_image" accept="image/*" required>
 
-  <p class="note">
-    ※将来の姿を予測するものではなく、イメージとして生成するサービスです
-  </p>
+      <p>将来の職業</p>
+      <input type="text" name="job" placeholder="例：宇宙飛行士" required>
 
-  <form action="/generate" method="post" enctype="multipart/form-data">
+      <button type="submit" onclick="this.innerText='生成中...'">
+        未来の姿を作る
+      </button>
+    </form>
 
-    <p>お子様の写真（ファイル名＝名前）</p>
-    <input type="file" name="child_image" required>
+    {% if image_url %}
+      <div class="result">
+        <h2>生成結果</h2>
+        <img src="{{ image_url }}" alt="生成画像">
 
-    <p>将来の職業</p>
-    <input type="text" name="job" placeholder="例：宇宙飛行士" required>
+        <a href="{{ image_url }}" download class="download-button">
+          画像をダウンロード
+        </a>
+      </div>
+    {% endif %}
 
-    <button type="submit" onclick="this.innerText='生成中...'">
-      未来の姿を作る
-    </button>
-
-  </form>
-
-  {% if image_url %}
-    <div class="result">
-      <h2>生成結果</h2>
-      <img src="{{ image_url }}">
-    </div>
-  {% endif %}
-
-  {% if error %}
-    <p style="color:red;">{{ error }}</p>
-  {% endif %}
-
-</div>
-
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+  </div>
 </body>
 </html>
