@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>未来フォト生成</title>
+
+  <style>
+    body {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #ffe6f0, #fff5f8);
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      color: #ff4f8b;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 14px;
+      color: #666;
+    }
+
+    input[type="file"],
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #ff4f8b, #ff7ab5);
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .result img {
+      margin-top: 20px;
+      width: 100%;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    .note {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 20px;
+    }
+
+  </style>
+
+</head>
+<body>
+
+<div class="container">
+
+  <h1>未来フォト生成</h1>
+
+  <p class="note">
+    ※将来の姿を予測するものではなく、イメージとして生成するサービスです
+  </p>
+
+  <form action="/generate" method="post" enctype="multipart/form-data">
+
+    <p>お子様の写真（ファイル名＝名前）</p>
+    <input type="file" name="child_image" required>
+
+    <p>将来の職業</p>
+    <input type="text" name="job" placeholder="例：宇宙飛行士" required>
+
+    <button type="submit" onclick="this.innerText='生成中...'">
+      未来の姿を作る
+    </button>
+
+  </form>
+
+  {% if image_url %}
+    <div class="result">
+      <h2>生成結果</h2>
+      <img src="{{ image_url }}">
+    </div>
+  {% endif %}
+
+  {% if error %}
+    <p style="color:red;">{{ error }}</p>
+  {% endif %}
+
+</div>
+
+</body>
+</html>
