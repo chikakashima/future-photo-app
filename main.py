@@ -48,15 +48,29 @@ async def generate(
             f.write(await child_image.read())
 
         prompt = f"""
-Create an inspiring future portrait based on the uploaded child photo.
+Create a premium keepsake portrait inspired by the uploaded child photo.
 
-The person should be shown as an adult working as a {job}.
+Use the uploaded child photo as the visual reference for the person's overall
+identity, warmth, and natural charm. Show this person as a grown-up adult
+joyfully working as a {job}.
 
-Important:
-- This is not a prediction of the child's future face.
-- Create a respectful, positive, future-oriented image.
-- Make it suitable as a family keepsake.
-- High quality, photorealistic, professional lighting.
+Art direction:
+- Make the image feel like a beautiful gift for the child and their family.
+- Bright, hopeful, respectful, positive, and family-friendly.
+- Premium commemorative photo style, suitable for printing or presenting.
+- Natural high-quality portrait photography with a gentle touch of fantasy.
+- Theme-park, toy-box, and dreamy pastel world atmosphere.
+- Sparkling highlights, soft rainbow accents, floating light particles,
+  cheerful decorations, and a sense of wonder.
+- Create a gorgeous professional background that matches the {job}, making
+  the career feel exciting, aspirational, and full of possibility.
+- The person should look confident, kind, and proud while working.
+- Polished composition, premium lighting, clean details, vivid but soft colors.
+
+Avoid:
+- Scary, dark, cynical, disrespectful, or adult-themed elements.
+- Text, logos, watermarks, or captions inside the image.
+- Anything that suggests a factual prediction or guaranteed outcome.
 """
 
         result = client.images.edit(
