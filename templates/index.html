@@ -7,17 +7,19 @@
 
   <style>
     :root {
-      --pink: #ff7eb6;
-      --rose: #ff5fa2;
-      --peach: #ffbf9f;
-      --yellow: #ffe58a;
-      --mint: #9ff0d8;
-      --sky: #93d9ff;
-      --lavender: #c9b6ff;
-      --ink: #4b4262;
-      --muted: #786f8f;
-      --white: #ffffff;
-      --shadow: 0 22px 60px rgba(124, 88, 154, 0.2);
+      --navy: #071229;
+      --blue: #1678ff;
+      --gold: #f8ce6a;
+      --gold-2: #fff1b8;
+      --orange: #ff8a2a;
+      --green: #1fc17a;
+      --red: #ed514c;
+      --ink: #16213d;
+      --muted: rgba(255, 255, 255, 0.78);
+      --glass: rgba(9, 18, 42, 0.54);
+      --glass-light: rgba(255, 255, 255, 0.14);
+      --line: rgba(255, 255, 255, 0.34);
+      --shadow: 0 26px 70px rgba(0, 0, 0, 0.34);
     }
 
     * {
@@ -27,176 +29,170 @@
     body {
       min-height: 100vh;
       margin: 0;
-      color: var(--ink);
+      color: white;
       font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
-      background:
-        radial-gradient(circle at 12% 18%, rgba(255, 229, 138, 0.95) 0 38px, transparent 39px),
-        radial-gradient(circle at 88% 14%, rgba(147, 217, 255, 0.85) 0 54px, transparent 55px),
-        radial-gradient(circle at 82% 82%, rgba(201, 182, 255, 0.75) 0 70px, transparent 71px),
-        linear-gradient(135deg, #fff8cf 0%, #ffe4f1 36%, #daf5ff 72%, #ecfff6 100%);
-      overflow-x: hidden;
-    }
-
-    body::before,
-    body::after {
-      position: fixed;
-      z-index: 0;
-      pointer-events: none;
-      content: "";
-    }
-
-    body::before {
-      top: 28px;
-      left: 50%;
-      width: min(760px, 84vw);
-      height: 230px;
-      transform: translateX(-50%);
-      border-radius: 50% 50% 44% 44%;
-      background:
-        radial-gradient(circle at 18% 58%, rgba(255, 255, 255, 0.92) 0 52px, transparent 53px),
-        radial-gradient(circle at 38% 38%, rgba(255, 255, 255, 0.88) 0 76px, transparent 77px),
-        radial-gradient(circle at 63% 48%, rgba(255, 255, 255, 0.86) 0 64px, transparent 65px),
-        radial-gradient(circle at 82% 62%, rgba(255, 255, 255, 0.9) 0 48px, transparent 49px);
-      opacity: 0.75;
-      filter: blur(0.2px);
-    }
-
-    body::after {
-      right: -72px;
-      bottom: 80px;
-      width: 240px;
-      height: 240px;
-      border: 28px solid rgba(255, 126, 182, 0.22);
-      border-top-color: rgba(255, 229, 138, 0.46);
-      border-left-color: rgba(147, 217, 255, 0.36);
-      border-radius: 50%;
-    }
-
-    .page {
-      position: relative;
-      z-index: 1;
-      width: min(1040px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 32px 0 48px;
+      background: var(--navy);
     }
 
     .hero {
       position: relative;
-      margin-bottom: 22px;
-      padding: 34px 18px 20px;
-      text-align: center;
+      min-height: 100vh;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.45)),
+        linear-gradient(180deg, rgba(7, 18, 41, 0.08), rgba(7, 18, 41, 0.82)),
+        url("/static/images/hero-bg.png"),
+        radial-gradient(circle at 72% 26%, rgba(248, 206, 106, 0.48) 0 110px, transparent 112px),
+        linear-gradient(135deg, #071229 0%, #123c70 48%, #d88b28 100%);
+      background-position: center;
+      background-size: cover;
     }
 
     .hero::before {
       position: absolute;
-      top: 8px;
-      left: 5%;
-      width: 90%;
-      height: 22px;
+      inset: 0;
+      pointer-events: none;
       content: "";
       background:
-        radial-gradient(circle, var(--pink) 0 5px, transparent 6px) 0 0 / 72px 22px,
-        radial-gradient(circle, var(--yellow) 0 5px, transparent 6px) 24px 0 / 72px 22px,
-        radial-gradient(circle, var(--sky) 0 5px, transparent 6px) 48px 0 / 72px 22px;
-      opacity: 0.82;
+        radial-gradient(circle at 22% 22%, rgba(255, 241, 184, 0.18) 0 120px, transparent 122px),
+        linear-gradient(100deg, transparent 0 18%, rgba(255, 255, 255, 0.12) 19%, transparent 34%),
+        linear-gradient(252deg, transparent 0 12%, rgba(248, 206, 106, 0.16) 13%, transparent 30%);
+      opacity: 0.95;
     }
 
-    .badge {
-      display: inline-flex;
-      gap: 8px;
+    .hero::after {
+      position: absolute;
+      inset: auto 0 0;
+      height: 9px;
+      content: "";
+      background: linear-gradient(90deg, var(--blue), var(--green), var(--gold), var(--orange), var(--red));
+      box-shadow: 0 -18px 52px rgba(248, 206, 106, 0.26);
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(340px, 0.78fr);
+      gap: clamp(18px, 3vw, 36px);
+      width: min(1180px, calc(100% - 32px));
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: clamp(24px, 4vw, 48px) 0;
       align-items: center;
-      justify-content: center;
-      margin-bottom: 14px;
-      padding: 8px 14px;
-      border: 2px solid rgba(255, 255, 255, 0.8);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.66);
-      box-shadow: 0 10px 24px rgba(255, 126, 182, 0.18);
-      color: #9a5aaf;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0;
     }
 
-    .sparkle {
-      color: #ffb000;
+    .copy-panel {
+      max-width: 680px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 16px;
+      padding: 8px 13px;
+      border: 1px solid rgba(248, 206, 106, 0.6);
+      border-radius: 999px;
+      background: rgba(7, 18, 41, 0.48);
+      color: var(--gold-2);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(14px);
+    }
+
+    .eyebrow::before {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      content: "";
+      background: var(--gold);
+      box-shadow: 0 0 20px rgba(248, 206, 106, 0.9);
     }
 
     h1 {
       margin: 0;
-      color: #ff4f95;
-      font-size: clamp(36px, 8vw, 68px);
-      line-height: 1.06;
+      font-size: clamp(54px, 7vw, 72px);
+      line-height: 0.98;
       letter-spacing: 0;
-      text-shadow:
-        0 4px 0 rgba(255, 255, 255, 0.82),
-        0 12px 28px rgba(255, 95, 162, 0.24);
+      background: linear-gradient(180deg, #ffffff 0%, var(--gold-2) 42%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 14px 42px rgba(0, 0, 0, 0.42);
     }
 
-    .subcopy {
-      max-width: 680px;
-      margin: 16px auto 0;
-      color: #695e82;
-      font-size: clamp(16px, 3.6vw, 21px);
+    .catch {
+      max-width: 650px;
+      margin: 18px 0 0;
+      color: #ffffff;
+      font-size: clamp(30px, 4.2vw, 52px);
+      font-weight: 900;
+      line-height: 1.15;
+      text-shadow: 0 14px 38px rgba(0, 0, 0, 0.48);
+    }
+
+    .lead {
+      max-width: 590px;
+      margin: 15px 0 0;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: clamp(16px, 2vw, 20px);
       font-weight: 700;
-      line-height: 1.7;
+      line-height: 1.75;
+      text-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
-      gap: 24px;
-      align-items: start;
-    }
-
-    .panel,
-    .result {
+    .form-card,
+    .result-card {
       position: relative;
-      border: 3px solid rgba(255, 255, 255, 0.86);
-      border-radius: 28px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 26px;
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 250, 255, 0.92)),
-        repeating-linear-gradient(45deg, rgba(255, 191, 159, 0.12) 0 10px, rgba(147, 217, 255, 0.12) 10px 20px);
+        linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08)),
+        var(--glass);
       box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
     }
 
-    .panel {
-      padding: 28px;
-    }
-
-    .panel::before,
-    .result::before {
+    .form-card::before,
+    .result-card::before {
       position: absolute;
-      top: -16px;
-      right: 28px;
-      width: 82px;
-      height: 42px;
-      border-radius: 42px 42px 12px 12px;
+      inset: 0;
+      pointer-events: none;
       content: "";
       background:
-        radial-gradient(circle at 28% 42%, rgba(255, 255, 255, 0.88) 0 9px, transparent 10px),
-        linear-gradient(135deg, var(--mint), var(--sky));
-      box-shadow: 0 10px 24px rgba(90, 180, 210, 0.18);
+        linear-gradient(90deg, var(--blue), var(--green), var(--gold), var(--orange), var(--red)) 0 0 / 100% 5px no-repeat,
+        radial-gradient(circle at 100% 100%, rgba(248, 206, 106, 0.22) 0 90px, transparent 92px);
+    }
+
+    .form-card {
+      max-width: 520px;
+      margin-top: 24px;
+      padding: 22px;
     }
 
     .intro {
-      margin: 0 0 18px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1.8;
+      position: relative;
+      margin: 0 0 16px;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.65;
     }
 
     .field {
-      margin-top: 18px;
-      text-align: left;
+      position: relative;
+      margin-top: 14px;
     }
 
     label {
       display: block;
-      margin-bottom: 9px;
-      color: #5b5273;
-      font-size: 15px;
+      margin-bottom: 7px;
+      color: #fff4c8;
+      font-size: 14px;
       font-weight: 900;
     }
 
@@ -204,377 +200,389 @@
     input[type="text"] {
       width: 100%;
       min-height: 54px;
-      padding: 14px 16px;
-      border: 2px solid rgba(201, 182, 255, 0.65);
-      border-radius: 18px;
+      padding: 13px 15px;
+      border: 1px solid rgba(255, 255, 255, 0.38);
+      border-radius: 16px;
       outline: none;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.94);
       color: var(--ink);
       font-size: 16px;
-      box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.7);
+      box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.72), 0 12px 24px rgba(0, 0, 0, 0.14);
     }
 
     input[type="file"] {
-      padding: 12px;
+      padding: 9px;
       cursor: pointer;
     }
 
     input[type="file"]::file-selector-button {
-      margin-right: 12px;
-      padding: 10px 14px;
+      margin-right: 10px;
+      padding: 10px 13px;
       border: 0;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--lavender), var(--sky));
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--blue), var(--green));
       color: white;
       font-weight: 900;
       cursor: pointer;
     }
 
     input:focus {
-      border-color: var(--pink);
-      box-shadow: 0 0 0 5px rgba(255, 126, 182, 0.18);
+      border-color: var(--gold);
+      box-shadow: 0 0 0 5px rgba(248, 206, 106, 0.2), 0 12px 24px rgba(0, 0, 0, 0.14);
     }
 
     button,
     .download-button {
+      position: relative;
       display: flex;
       width: 100%;
-      min-height: 58px;
+      min-height: 60px;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      margin-top: 24px;
-      padding: 16px 20px;
+      margin-top: 18px;
+      padding: 15px 18px;
       border: 0;
-      border-radius: 20px;
+      border-radius: 18px;
       background:
-        linear-gradient(135deg, #ff5fa2 0%, #ff9f7c 48%, #ffd85e 100%);
-      box-shadow:
-        0 14px 24px rgba(255, 95, 162, 0.28),
-        inset 0 2px 0 rgba(255, 255, 255, 0.5);
+        linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent),
+        linear-gradient(135deg, var(--blue), var(--green) 42%, var(--orange));
+      box-shadow: 0 18px 36px rgba(22, 120, 255, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.5);
       color: white;
       cursor: pointer;
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 900;
       line-height: 1.2;
       text-align: center;
       text-decoration: none;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    button::after,
+    .download-button::after {
+      position: absolute;
+      inset: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.46);
+      border-radius: 14px;
+      content: "";
+      pointer-events: none;
     }
 
     button:hover,
     .download-button:hover {
       transform: translateY(-2px);
-      box-shadow:
-        0 18px 30px rgba(255, 95, 162, 0.34),
-        inset 0 2px 0 rgba(255, 255, 255, 0.55);
+      box-shadow: 0 22px 42px rgba(22, 120, 255, 0.36), inset 0 2px 0 rgba(255, 255, 255, 0.58);
     }
 
     .note {
-      margin: 18px 0 0;
-      padding: 14px 16px;
-      border: 2px dashed rgba(255, 126, 182, 0.42);
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.68);
-      color: #7b708d;
+      position: relative;
+      margin: 15px 0 0;
+      padding: 11px 12px;
+      border: 1px dashed rgba(248, 206, 106, 0.4);
+      border-radius: 15px;
+      background: rgba(7, 18, 41, 0.34);
+      color: rgba(255, 255, 255, 0.78);
       font-size: 12px;
       font-weight: 700;
-      line-height: 1.7;
-      text-align: left;
+      line-height: 1.55;
     }
 
-    .dream-side {
-      min-height: 420px;
-      padding: 24px;
-      border-radius: 28px;
-      background:
-        radial-gradient(circle at 24% 24%, rgba(255, 255, 255, 0.82) 0 34px, transparent 35px),
-        radial-gradient(circle at 78% 24%, rgba(255, 255, 255, 0.72) 0 46px, transparent 47px),
-        linear-gradient(135deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.12));
+    .error {
+      position: relative;
+      margin: 13px 0 0;
+      padding: 11px 12px;
+      border-radius: 15px;
+      background: rgba(255, 240, 243, 0.96);
+      color: #bd2743;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.5;
     }
 
-    .toy-stage {
-      position: sticky;
-      top: 22px;
-      min-height: 420px;
-      overflow: hidden;
-      border: 3px solid rgba(255, 255, 255, 0.65);
-      border-radius: 30px;
-      background:
-        radial-gradient(circle at 50% 95%, rgba(255, 255, 255, 0.9) 0 64px, transparent 65px),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.2));
-      box-shadow: 0 18px 46px rgba(101, 104, 178, 0.16);
+    .result-card {
+      align-self: center;
+      padding: 18px;
     }
 
-    .rainbow {
-      position: absolute;
-      right: -84px;
-      bottom: 62px;
-      width: 300px;
-      height: 300px;
-      border: 30px solid rgba(255, 126, 182, 0.62);
-      border-right-color: transparent;
-      border-bottom-color: transparent;
-      border-radius: 50%;
-      transform: rotate(45deg);
-    }
-
-    .rainbow::before,
-    .rainbow::after {
-      position: absolute;
-      border-right-color: transparent;
-      border-bottom-color: transparent;
-      border-radius: 50%;
-      content: "";
-    }
-
-    .rainbow::before {
-      inset: 22px;
-      border: 25px solid rgba(255, 229, 138, 0.72);
-      border-right-color: transparent;
-      border-bottom-color: transparent;
-    }
-
-    .rainbow::after {
-      inset: 62px;
-      border: 23px solid rgba(147, 217, 255, 0.72);
-      border-right-color: transparent;
-      border-bottom-color: transparent;
-    }
-
-    .balloon {
-      position: absolute;
-      width: 74px;
-      height: 90px;
-      border-radius: 50% 50% 48% 48%;
-      box-shadow: inset -12px -16px 0 rgba(0, 0, 0, 0.05);
-    }
-
-    .balloon::after {
-      position: absolute;
-      left: 35px;
-      top: 88px;
-      width: 2px;
-      height: 124px;
-      content: "";
-      background: rgba(120, 111, 143, 0.24);
-    }
-
-    .balloon.one {
-      top: 46px;
-      left: 38px;
-      background: linear-gradient(135deg, #ff8bbf, #ffd0e4);
-    }
-
-    .balloon.two {
-      top: 92px;
-      right: 78px;
-      width: 62px;
-      height: 78px;
-      background: linear-gradient(135deg, #8edcff, #dff6ff);
-    }
-
-    .star {
-      position: absolute;
-      width: 18px;
-      height: 18px;
-      background: #ffd85e;
-      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-      filter: drop-shadow(0 4px 6px rgba(255, 176, 0, 0.24));
-    }
-
-    .star.s1 { top: 48px; right: 34%; }
-    .star.s2 { top: 190px; left: 26%; transform: scale(1.45); }
-    .star.s3 { right: 20%; bottom: 88px; transform: scale(1.2); }
-
-    .gift {
-      position: absolute;
-      left: 48px;
-      bottom: 44px;
-      width: 138px;
-      height: 118px;
-      border-radius: 20px;
-      background:
-        linear-gradient(90deg, transparent 0 44%, rgba(255, 255, 255, 0.58) 44% 56%, transparent 56%),
-        linear-gradient(180deg, #ff8bbf 0 34%, #ff6ea8 34%);
-      box-shadow: 0 18px 26px rgba(255, 95, 162, 0.2);
-    }
-
-    .gift::before {
-      position: absolute;
-      top: -28px;
-      left: 24px;
-      width: 90px;
-      height: 38px;
-      border-radius: 24px 24px 8px 8px;
-      content: "";
-      background: #ffe58a;
-      box-shadow: inset 0 -10px 0 rgba(255, 159, 124, 0.22);
-    }
-
-    .result {
-      grid-column: 1 / -1;
-      margin-top: 24px;
-      padding: 28px;
-      text-align: center;
+    .result-header {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
     h2 {
-      margin: 0 0 18px;
-      color: #ff4f95;
-      font-size: clamp(24px, 5vw, 36px);
+      margin: 0;
+      color: #ffffff;
+      font-size: clamp(22px, 2.5vw, 31px);
+      line-height: 1.2;
       letter-spacing: 0;
+      text-shadow: 0 8px 24px rgba(0, 0, 0, 0.34);
     }
 
-    .photo-frame {
-      max-width: 680px;
+    .result-badge {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border: 1px solid rgba(248, 206, 106, 0.48);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffe8a8;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .poster-frame {
+      position: relative;
+      width: min(100%, 520px, calc(100vh - 180px));
       margin: 0 auto;
       padding: 14px;
-      border-radius: 26px;
+      border: 5px solid transparent;
+      border-radius: 30px;
       background:
-        linear-gradient(135deg, rgba(255, 126, 182, 0.48), rgba(255, 229, 138, 0.56), rgba(147, 217, 255, 0.5));
-      box-shadow: 0 18px 38px rgba(124, 88, 154, 0.22);
+        linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(255, 248, 225, 0.92)) padding-box,
+        linear-gradient(135deg, #fff4bd, var(--gold), var(--orange), #b98025, var(--blue)) border-box;
+      box-shadow:
+        0 28px 58px rgba(0, 0, 0, 0.34),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.82);
     }
 
-    .photo-frame img {
+    .poster-frame::before {
+      position: absolute;
+      inset: 20px;
+      z-index: 2;
+      border: 1px solid rgba(248, 206, 106, 0.9);
+      border-radius: 19px;
+      content: "";
+      pointer-events: none;
+      box-shadow:
+        inset 0 0 28px rgba(255, 255, 255, 0.34),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+    }
+
+    .poster-frame::after {
+      position: absolute;
+      inset: 14px;
+      z-index: 1;
+      border-radius: 22px;
+      pointer-events: none;
+      content: "";
+      background:
+        linear-gradient(115deg, rgba(255, 255, 255, 0.24) 0 16%, transparent 38%),
+        radial-gradient(circle at 50% 112%, rgba(0, 0, 0, 0.26), transparent 36%);
+      mix-blend-mode: soft-light;
+    }
+
+    .poster-frame img {
+      position: relative;
+      z-index: 0;
       display: block;
       width: 100%;
-      border: 8px solid white;
-      border-radius: 20px;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 22px;
       background: white;
+      box-shadow:
+        inset 0 0 34px rgba(0, 0, 0, 0.22),
+        0 10px 24px rgba(0, 0, 0, 0.16);
+    }
+
+    .placeholder {
+      display: grid;
+      min-height: min(372px, calc(100vh - 210px));
+      place-items: center;
+      border-radius: 22px;
+      color: white;
+      background:
+        linear-gradient(90deg, rgba(7, 18, 41, 0.76), rgba(7, 18, 41, 0.34)),
+        url("/static/images/hero-bg.png"),
+        radial-gradient(circle at 50% 36%, rgba(248, 206, 106, 0.88) 0 44px, transparent 45px),
+        linear-gradient(145deg, #071229, #174f86 58%, #f2af45);
+      background-position: center;
+      background-size: cover;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .placeholder-content {
+      position: relative;
+      z-index: 1;
+      width: min(300px, 82%);
+      padding: 24px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      border-radius: 22px;
+      background: rgba(7, 18, 41, 0.5);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(12px);
+    }
+
+    .placeholder-content span {
+      display: block;
+      margin-bottom: 9px;
+      color: #ffe7a5;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .placeholder-content p {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1.65;
     }
 
     .download-button {
       max-width: 360px;
-      margin: 22px auto 0;
-      background: linear-gradient(135deg, #7fdcc2 0%, #72c7ff 48%, #b7a2ff 100%);
-      box-shadow:
-        0 14px 24px rgba(85, 178, 216, 0.24),
-        inset 0 2px 0 rgba(255, 255, 255, 0.5);
+      margin: 14px auto 0;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent),
+        linear-gradient(135deg, var(--gold), var(--orange) 46%, var(--blue));
+      box-shadow: 0 20px 38px rgba(255, 138, 42, 0.34), inset 0 2px 0 rgba(255, 255, 255, 0.56);
     }
 
-    .error {
-      margin: 18px 0 0;
-      padding: 14px 16px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.78);
-      color: #d42d67;
-      font-size: 13px;
-      font-weight: 800;
-      line-height: 1.6;
-    }
-
-    @media (max-width: 820px) {
-      .page {
-        width: min(100% - 24px, 560px);
-        padding-top: 18px;
-      }
-
+    @media (max-width: 920px) {
       .hero {
-        padding-top: 32px;
+        min-height: auto;
       }
 
-      .layout {
+      .hero-inner {
         grid-template-columns: 1fr;
+        width: min(100% - 24px, 680px);
+        min-height: auto;
+        padding: 34px 0 42px;
       }
 
-      .dream-side {
-        display: none;
+      .form-card {
+        max-width: none;
       }
 
-      .panel,
-      .result {
-        border-radius: 24px;
+      .poster-frame {
+        width: min(100%, 520px);
       }
 
-      .panel {
-        padding: 22px;
+      .placeholder {
+        min-height: 340px;
       }
     }
 
-    @media (max-width: 420px) {
-      .page {
-        width: min(100% - 18px, 560px);
+    @media (max-width: 520px) {
+      .hero-inner {
+        width: min(100% - 18px, 680px);
+        padding: 28px 0 34px;
       }
 
-      .badge {
-        font-size: 12px;
+      h1 {
+        font-size: 44px;
       }
 
-      .panel {
-        padding: 18px;
+      .catch {
+        font-size: 28px;
+      }
+
+      .lead {
+        font-size: 15px;
+      }
+
+      .form-card,
+      .result-card {
+        padding: 15px;
+        border-radius: 22px;
+      }
+
+      input[type="file"],
+      input[type="text"] {
+        min-height: 50px;
+        font-size: 15px;
       }
 
       button,
       .download-button {
+        min-height: 56px;
         font-size: 16px;
+      }
+
+      .result-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .poster-frame {
+        padding: 10px;
+        border-radius: 24px;
+      }
+
+      .poster-frame img,
+      .placeholder {
+        border-radius: 18px;
       }
     }
   </style>
 </head>
 
 <body>
-  <main class="page">
-    <section class="hero" aria-labelledby="page-title">
-      <div class="badge"><span class="sparkle">★</span> ゆめいっぱいの記念フォト <span class="sparkle">★</span></div>
-      <h1 id="page-title">未来フォトメーカー</h1>
-      <p class="subcopy">お子さまの「なりたい！」を、夢いっぱいの未来フォトに。</p>
-    </section>
+  <section class="hero" aria-labelledby="page-title">
+    <div class="hero-inner">
+      <div class="copy-panel">
+        <div class="eyebrow">PREMIUM AI PHOTO GIFT</div>
+        <h1 id="page-title">未来フォトメーカー</h1>
+        <p class="catch">10年後の夢を、<br>世界で1枚の記念フォトに。</p>
+        <p class="lead">お子さまの「なりたい！」を<br>映画ポスターのような未来フォトとして残せます。</p>
 
-    <section class="layout" aria-label="未来フォト作成フォーム">
-      <div class="panel">
-        <p class="intro">写真と職業を入れるだけで、プレゼントカードのような未来フォトを作れます。</p>
+        <div class="form-card">
+          <p class="intro">写真と職業を入れるだけで、映画ポスターのような未来フォトを作れます。</p>
 
-        <form action="/generate" method="post" enctype="multipart/form-data">
-          <div class="field">
-            <label for="child_image">お子さまの写真</label>
-            <input id="child_image" type="file" name="child_image" accept="image/*" required>
-          </div>
+          <form action="/generate" method="post" enctype="multipart/form-data">
+            <div class="field">
+              <label for="child_image">お子さまの写真</label>
+              <input id="child_image" type="file" name="child_image" accept="image/*" required>
+            </div>
 
-          <div class="field">
-            <label for="job">将来の職業</label>
-            <input id="job" type="text" name="job" placeholder="例：宇宙飛行士、パティシエ、サッカー選手" required>
-          </div>
+            <div class="field">
+              <label for="job">将来の職業</label>
+              <input id="job" type="text" name="job" placeholder="例：俳優、医者、宇宙飛行士、パティシエ" required>
+            </div>
 
-          <button type="submit" onclick="this.innerText='夢をふくらませています...'">
-            未来フォトをつくる
-          </button>
-        </form>
+            <button type="submit" onclick="this.innerText='未来フォトを作成中...'">
+              未来フォトをつくる！
+            </button>
+          </form>
 
-        <p class="note">
-          ※この画像は将来の姿を予測するものではなく、入力内容をもとにAIが作成するイメージ画像です。
-        </p>
+          <p class="note">
+            ※この画像は将来の姿を予測するものではなく、入力内容をもとにAIが作成するイメージ画像です。
+          </p>
 
-        {% if error %}
-          <p class="error">{{ error }}</p>
-        {% endif %}
-      </div>
-
-      <div class="dream-side" aria-hidden="true">
-        <div class="toy-stage">
-          <div class="balloon one"></div>
-          <div class="balloon two"></div>
-          <div class="star s1"></div>
-          <div class="star s2"></div>
-          <div class="star s3"></div>
-          <div class="rainbow"></div>
-          <div class="gift"></div>
+          {% if error %}
+            <p class="error">{{ error }}</p>
+          {% endif %}
         </div>
       </div>
 
-      {% if image_url %}
-        <div class="result">
+      <div class="result-card">
+        <div class="result-header">
           <h2>できあがった未来フォト</h2>
-          <div class="photo-frame">
+          <span class="result-badge">GIFT FRAME</span>
+        </div>
+
+        {% if image_url %}
+          <div class="poster-frame">
             <img src="{{ image_url }}" alt="できあがった未来フォト">
           </div>
 
           <a href="{{ image_url }}" download class="download-button">
             画像をダウンロード
           </a>
-        </div>
-      {% endif %}
-    </section>
-  </main>
+        {% else %}
+          <div class="poster-frame">
+            <div class="placeholder" aria-hidden="true">
+              <div class="placeholder-content">
+                <span>PHOTO PREVIEW</span>
+                <p>ここに未来フォトが表示されます</p>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
 </body>
 </html>
