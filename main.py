@@ -3,6 +3,7 @@ import uuid
 import base64
 import time
 import io
+import mimetypes
 from dotenv import load_dotenv
 from openai import OpenAI
 from PIL import Image, ImageFilter, ImageEnhance
@@ -22,6 +23,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 LANDSCAPE_SIZE = (1536, 1024)
+VISION_MODEL = os.getenv("VISION_MODEL", "gpt-4o-mini")
 
 
 def make_landscape_image(image_bytes: bytes) -> bytes:
@@ -73,6 +75,70 @@ def make_landscape_image(image_bytes: bytes) -> bytes:
     return output.getvalue()
 
 
+def get_safe_photo_features(image_bytes: bytes, filename) -> str:
+    mime_type = mimetypes.guess_type(filename or "")[0] or "image/png"
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+    image_url = f"data:{mime_type};base64,{image_base64}"
+
+    try:
+        response = client.chat.completions.create(
+            model=VISION_MODEL,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You describe only safe, non-identifying visual "
+                        "atmosphere from an uploaded image. Do not identify the "
+                        "person. Do not estimate age. Do not predict the future. "
+                        "Do not judge attractiveness. Keep the description "
+                        "wholesome, respectful, and concise."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": (
+                                "Extract safe visual atmosphere notes for a "
+                                "profession-inspired keepsake portrait. Include "
+                                "only: face shape, eye shape, eye size, eyebrow "
+                                "style, nose impression, smile impression, "
+                                "hairstyle, hair color, general skin tone, and "
+                                "overall visual style. "
+                                "Avoid identity, face matching, future prediction, "
+                                "age estimation, attractiveness evaluation, or "
+                                "body-related comments. Return short English "
+                                "phrases separated by commas, for example: "
+                                "round face, soft almond eyes, medium eyebrows, "
+                                "warm smile, straight black hair, fair skin tone, "
+                                "gentle and cheerful atmosphere."
+                            ),
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": image_url},
+                        },
+                    ],
+                },
+            ],
+            max_tokens=120,
+        )
+
+        features = response.choices[0].message.content or ""
+        features = " ".join(features.split())
+        return features or (
+            "soft facial impression, warm smile, neat hairstyle, natural hair "
+            "color, general natural skin tone, gentle and positive atmosphere"
+        )
+
+    except Exception:
+        return (
+            "soft facial impression, warm smile, neat hairstyle, natural hair "
+            "color, general natural skin tone, gentle and positive atmosphere"
+        )
+
+
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse(
@@ -86,6 +152,8 @@ async def index(request: Request):
 async def generate(
     request: Request,
     job: str = Form(...),
+    person_type: str = Form(...),
+    mood: str = Form(...),
     child_image: UploadFile = File(...)
 ):
     image_url = None
@@ -93,20 +161,64 @@ async def generate(
 
     try:
         original_name = child_image.filename
-        child_name = os.path.splitext(original_name)[0]
+        child_name = os.path.splitext(original_name or f"photo_{uuid.uuid4()}")[0]
 
-        upload_path = f"temp_{uuid.uuid4()}_{original_name}"
+        uploaded_image_bytes = await child_image.read()
+        photo_features = get_safe_photo_features(uploaded_image_bytes, original_name)
 
-        with open(upload_path, "wb") as f:
-            f.write(await child_image.read())
+        person_type_prompts = {
+            "女の子向け": (
+                "Use a feminine-presenting person for the career-experience "
+                "portrait, while keeping the result wholesome, respectful, and "
+                "family-friendly."
+            ),
+            "男の子向け": (
+                "Use a masculine-presenting person for the career-experience "
+                "portrait, while keeping the result wholesome, respectful, and "
+                "family-friendly."
+            ),
+            "性別指定なし": (
+                "Use a neutral presentation without emphasizing gender. Keep the "
+                "career image balanced, wholesome, respectful, and family-friendly."
+            ),
+        }
+
+        mood_prompts = {
+            "明るくかわいい": "Use a bright, cheerful, gentle, and friendly mood.",
+            "かっこいい": "Use a cool, confident, polished, and energetic mood.",
+            "上品": "Use an elegant, refined, calm, and premium mood.",
+            "元気いっぱい": "Use a lively, energetic, joyful, and positive mood.",
+            "落ち着いた雰囲気": "Use a calm, composed, warm, and peaceful mood.",
+        }
+
+        person_type_prompt = person_type_prompts.get(
+            person_type,
+            person_type_prompts["性別指定なし"]
+        )
+        mood_prompt = mood_prompts.get(
+            mood,
+            "Use a warm, respectful, family-friendly mood."
+        )
 
         prompt = f"""
-Create a wholesome premium keepsake portrait inspired by the uploaded child photo.
+Create a wholesome premium keepsake image for a career theme.
 
-Use the uploaded child photo as a respectful visual reference for the person's
-overall identity, warmth, and natural charm. Show this person as a grown-up
-adult working in the profession: {job}. This is an imaginative family-friendly
-keepsake image, not a factual prediction.
+Create a profession-inspired portrait for the career theme: {job}. This is an
+imaginative career scene and family-friendly keepsake image, not a factual
+prediction. Do not base the image on any uploaded face or personal identity.
+
+Safe visual style notes from the uploaded photo:
+- {photo_features}
+
+Use these notes only as gentle visual-style inspiration for facial atmosphere,
+hairstyle, expression, and overall mood. Do not copy a face, identify a person,
+or imply a timeline.
+
+Person type:
+- {person_type_prompt}
+
+Mood:
+- {mood_prompt}
 
 Most important:
 - Create a respectful, positive, career-themed portrait that a family could
@@ -117,7 +229,8 @@ Most important:
   composition with a warm smile and confident expression.
 - Keep the full head visible with comfortable space above the hair. Do not crop
   the top of the head, face, shoulders, or important career details.
-- Keep the result natural, wholesome, and connected to the reference photo.
+- Keep the result natural, wholesome, and suitable as a generic career-experience
+  keepsake image.
 - Use bright lighting, clean composition, neat styling, and a print-worthy
   premium keepsake finish.
 
@@ -126,8 +239,9 @@ Person presentation:
 - Keep the facial expression warm, calm, confident, and family-friendly.
 - Use appropriate clothing for the profession and a respectful professional
   posture.
-- Avoid dramatic appearance changes or unrelated visual changes. Do not make
-  the person look unrelated to the reference photo.
+- Avoid implying that the image is based on a real person's face or identity.
+- Treat the result as a safe career-themed costume portrait or
+  profession-inspired portrait.
 
 Career storytelling:
 - Do not communicate the profession with only a single prop.
@@ -189,17 +303,15 @@ Avoid:
 - No background-only spectacle with an ordinary or unclear profession.
 - No random unrelated props.
 - No clapperboard-only actor image.
-- No scary, cynical, disrespectful, or adult-themed content.
+- No scary, cynical, disrespectful, or inappropriate content.
 """
 
-        with open(upload_path, "rb") as image_file:
-            result = client.images.edit(
-                model="gpt-image-1",
-                image=image_file,
-                prompt=prompt,
-                size="1536x1024",
-                n=1,
-            )
+        result = client.images.generate(
+            model="gpt-image-1",
+            prompt=prompt,
+            size="1536x1024",
+            n=1,
+        )
 
         image_base64 = result.data[0].b64_json
         image_bytes = base64.b64decode(image_base64)
