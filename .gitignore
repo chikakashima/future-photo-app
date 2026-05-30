@@ -3,3 +3,6 @@ venv/
 __pycache__/
 token.json
 credentials.json
+static/outputs/
+uploads/
+temp_*

@@ -2,8 +2,10 @@ import os
 import uuid
 import base64
 import time
+import io
 from dotenv import load_dotenv
 from openai import OpenAI
+from PIL import Image, ImageFilter, ImageEnhance
 
 from fastapi import FastAPI, Request, Form, UploadFile, File
 from fastapi.responses import HTMLResponse
@@ -18,6 +20,57 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+LANDSCAPE_SIZE = (1536, 1024)
+
+
+def make_landscape_image(image_bytes: bytes) -> bytes:
+    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+    target_width, target_height = LANDSCAPE_SIZE
+
+    if image.size == LANDSCAPE_SIZE:
+        output = io.BytesIO()
+        image.save(output, format="PNG")
+        return output.getvalue()
+
+    # Fill the wide canvas with a soft extension of the generated image so the
+    # final file is truly landscape even when the image API returns a square.
+    background = image.copy()
+    bg_scale = max(target_width / background.width, target_height / background.height)
+    bg_size = (
+        int(background.width * bg_scale),
+        int(background.height * bg_scale),
+    )
+    background = background.resize(bg_size, Image.Resampling.LANCZOS)
+    left = (background.width - target_width) // 2
+    top = (background.height - target_height) // 2
+    background = background.crop((left, top, left + target_width, top + target_height))
+    background = background.filter(ImageFilter.GaussianBlur(34))
+    background = ImageEnhance.Brightness(background).enhance(0.78)
+    background = ImageEnhance.Color(background).enhance(0.92)
+
+    foreground = image.copy()
+    max_foreground_width = int(target_width * 0.72)
+    max_foreground_height = int(target_height * 0.9)
+    fg_scale = min(
+        max_foreground_width / foreground.width,
+        max_foreground_height / foreground.height,
+        1.0,
+    )
+    fg_size = (
+        int(foreground.width * fg_scale),
+        int(foreground.height * fg_scale),
+    )
+    foreground = foreground.resize(fg_size, Image.Resampling.LANCZOS)
+
+    canvas = background
+    x = (target_width - foreground.width) // 2
+    y = (target_height - foreground.height) // 2
+    canvas.paste(foreground, (x, y))
+
+    output = io.BytesIO()
+    canvas.save(output, format="PNG")
+    return output.getvalue()
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -48,93 +101,92 @@ async def generate(
             f.write(await child_image.read())
 
         prompt = f"""
-Create a premium AI gift portrait inspired by the uploaded child photo.
+Create a wholesome premium keepsake portrait inspired by the uploaded child photo.
 
 Use the uploaded child photo as a respectful visual reference for the person's
 overall identity, warmth, and natural charm. Show this person as a grown-up
-adult thriving in the profession: {job}. This is an imaginative keepsake image,
-not a factual prediction.
+adult working in the profession: {job}. This is an imaginative family-friendly
+keepsake image, not a factual prediction.
 
 Most important:
-- The person must be the hero of the image, large in frame, bust-up or upper
-  body centered, with strong presence and direct emotional impact.
-- Make the person look naturally beautified but still believable and connected
-  to the reference photo; do not transform them into an unrelated person.
-- Create a premium, print-worthy portrait with the quality of an advertising
-  visual, movie poster, magazine cover, or professional publicity photo.
-- The image should feel like something a parent could frame and give as a
-  special present.
+- Create a respectful, positive, career-themed portrait that a family could
+  print, frame, and give as a special present.
+- Create a horizontal landscape image, like a premium event photo card or movie
+  poster, with enough space to show the career-themed background.
+- The person should be the clear main subject, shown in a medium upper-body
+  composition with a warm smile and confident expression.
+- Keep the full head visible with comfortable space above the hair. Do not crop
+  the top of the head, face, shoulders, or important career details.
+- Keep the result natural, wholesome, and connected to the reference photo.
+- Use bright lighting, clean composition, neat styling, and a print-worthy
+  premium keepsake finish.
 
-Person refinement:
-- Elevate facial features, hair, skin, expression, posture, clothing, and body
-  proportions with tasteful high-end portrait retouching.
-- Use flattering face and body proportions, clean skin, refined hair styling,
-  expressive eyes, confident posture, elegant wardrobe, and a bright charismatic
-  smile.
-- The person should feel successful, aspirational, polished, joyful, and
-  inspiring.
-- Avoid an ordinary snapshot look. Avoid plain clothing, weak posture, dull
-  expression, or a generic face.
+Person presentation:
+- Use polished professional portrait lighting and neat styling.
+- Keep the facial expression warm, calm, confident, and family-friendly.
+- Use appropriate clothing for the profession and a respectful professional
+  posture.
+- Avoid dramatic appearance changes or unrelated visual changes. Do not make
+  the person look unrelated to the reference photo.
 
 Career storytelling:
 - Do not communicate the profession with only a single prop.
-- Express the profession through a complete visual system: wardrobe, hairstyle,
-  posture, facial expression, lighting, environment, colors, and supporting
-  details must all belong to the world of {job}.
-- The career should be instantly recognizable at first glance.
-- Keep the background secondary. It should enhance the person and career, not
-  distract from them.
+- Express the profession through appropriate clothing, setting, lighting,
+  posture, and supporting details that all belong to the world of {job}.
+- The career should be recognizable at first glance without relying on text.
+- Keep the background supportive and clean, so the person and profession remain
+  easy to understand.
+- Use a balanced composition: the person in the foreground, with meaningful
+  career-themed background visible around them.
 
 If the job is actor, actress, performer, movie star, stage actor, 俳優, 女優, or similar:
 - Do not make a clapperboard the main idea. If a clapperboard appears, make it
   small and natural, never the focus.
-- Create the feeling of a lead actor's cinematic movie poster, red carpet photo,
-  film festival appearance, premiere screening, stage greeting, or high-end
-  publicity portrait.
-- Use a luxury suit, elegant dress, refined stage outfit, polished hair, tasteful
-  makeup or grooming, and a star-like pose.
-- Add cinematic spotlights, press flash, cameras, theater lights, red carpet,
-  audience glow, movie-premiere atmosphere, and sophisticated celebrity polish.
-- The person should look like a successful young star: charismatic, stylish,
-  confident, glamorous, and emotionally engaging.
+- Create a professional actor publicity portrait with a movie festival, red
+  carpet, premiere screening, stage greeting, theater, or film set atmosphere.
+- Use formal clothing or a refined stage outfit, neat hair, professional
+  portrait lighting, spotlights, cameras, and a calm confident expression.
+- Keep the tone polished, respectful, and family-friendly.
 
 If the job is doctor, nurse, surgeon, dentist, veterinarian, 医者, 看護師, or medical worker:
-- Create a bright premium healthcare advertising portrait.
-- Use a clean white coat or appropriate medical uniform, stethoscope, refined
-  grooming, warm trustworthy expression, and gentle confident posture.
+- Create a bright, respectful healthcare portrait.
+- Use a clean white coat or appropriate medical uniform, stethoscope, neat
+  grooming, warm trustworthy expression, and gentle professional posture.
 - Include a bright hospital, clinic, consultation room, soft daylight, and
   subtle medical equipment.
 
 If the job is astronaut, space pilot, space engineer, 宇宙飛行士, or space-related:
-- Create an epic cinematic space-career poster.
-- Use an impressive astronaut suit or mission-ready space uniform, heroic pose,
-  spacecraft, moon surface, Earth, space station, mission lights, and vast scale.
-- The person should look brave, polished, and inspiring.
+- Create an inspiring space-career portrait.
+- Use an astronaut suit or mission-ready space uniform, spacecraft, moon surface,
+  Earth, space station, mission lights, and a hopeful atmosphere.
+- Keep the person calm, confident, and professional.
 
 If the job is pastry chef, patissier, baker, パティシエ, or similar:
-- Use an elegant pastry chef uniform, refined patisserie setting, beautiful
-  cakes or desserts, warm premium lighting, and a skilled craftsperson mood.
+- Use a clean pastry chef uniform, refined patisserie setting, beautiful cakes
+  or desserts, warm lighting, and a skilled craftsperson atmosphere.
 
 If the job is soccer player, footballer, サッカー選手, or athlete:
-- Use a professional uniform, stadium lights, athletic confident posture,
-  energetic body language, victory atmosphere, and premium sports poster style.
+- Use a professional uniform, stadium setting, bright lights, confident sports
+  posture, and a positive team-sport atmosphere.
 
 For any other profession:
-- Choose sophisticated career-specific clothing, environment, lighting, pose,
-  and supporting details that make the profession clear and aspirational.
+- Choose appropriate career-specific clothing, setting, lighting, posture, and
+  supporting details that make the profession clear and positive.
 
 Visual style:
-- Premium gift portrait, cinematic poster quality, magazine cover quality,
-  professional career portrait, luxury theme park event magic, premium keepsake.
+- Premium keepsake, polished professional portrait, career-themed portrait,
+  family-friendly, respectful, joyful, bright lighting, clean composition,
+  print-worthy finish.
+- Horizontal 3:2 landscape composition, not a square close-up.
 - Use refined blue, gold, orange, green, and red accents. Avoid overly pink or
-  cheap childish styling.
-- Natural photorealism, high-end lighting, sharp focus, polished composition,
-  beautiful color grading, elegant depth of field, print-ready finish.
+  childish styling.
+- Natural photorealism, clear details, balanced colors, elegant depth of field,
+  and a clean professional finish.
 
 Avoid:
 - No text, captions, logos, watermarks, UI elements, or readable signs.
-- No background-only spectacle with an ordinary-looking person.
-- No plain clothes unless the profession specifically requires them.
+- No emphasis on external appearance changes or physical transformation.
+- No background-only spectacle with an ordinary or unclear profession.
 - No random unrelated props.
 - No clapperboard-only actor image.
 - No scary, cynical, disrespectful, or adult-themed content.
@@ -145,12 +197,13 @@ Avoid:
                 model="gpt-image-1",
                 image=image_file,
                 prompt=prompt,
-                size="1024x1024",
+                size="1536x1024",
                 n=1,
             )
 
         image_base64 = result.data[0].b64_json
         image_bytes = base64.b64decode(image_base64)
+        image_bytes = make_landscape_image(image_bytes)
 
         timestamp = int(time.time())
         output_filename = f"{child_name}_{timestamp}.png"

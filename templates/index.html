@@ -334,7 +334,7 @@
 
     .poster-frame {
       position: relative;
-      width: min(100%, 520px, calc(100vh - 180px));
+      width: min(100%, 680px, calc((100vh - 190px) * 1.5));
       margin: 0 auto;
       padding: 14px;
       border: 5px solid transparent;
@@ -378,10 +378,12 @@
       z-index: 0;
       display: block;
       width: 100%;
-      aspect-ratio: 1 / 1;
-      object-fit: cover;
+      aspect-ratio: 3 / 2;
+      object-fit: contain;
       border-radius: 22px;
-      background: white;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(248, 206, 106, 0.16), transparent 54%),
+        #101936;
       box-shadow:
         inset 0 0 34px rgba(0, 0, 0, 0.22),
         0 10px 24px rgba(0, 0, 0, 0.16);
@@ -389,7 +391,8 @@
 
     .placeholder {
       display: grid;
-      min-height: min(372px, calc(100vh - 210px));
+      aspect-ratio: 3 / 2;
+      min-height: 260px;
       place-items: center;
       border-radius: 22px;
       color: white;
@@ -457,11 +460,11 @@
       }
 
       .poster-frame {
-        width: min(100%, 520px);
+        width: min(100%, 680px);
       }
 
       .placeholder {
-        min-height: 340px;
+        min-height: 260px;
       }
     }
 
